@@ -1,0 +1,95 @@
+.landing-page{
+    background-color: black;
+    display: flex;
+    justify-content: center;
+}
+
+.landing-page > img {
+    width: 1540px;
+}
+
+.landing-text > h2 {
+    color: white;
+}
+
+.landing-text{
+    display: flex;
+    font-family: Raleway;
+    background-color: black;
+    justify-content: center;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.ammenities__container{
+    margin: 100px 10% 100px 10%;
+    font-family: Raleway;
+}
+
+.single__ammenity > img{
+    height: 380px;
+    width: 380px;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+.ammenities__images{
+    font-family: Raleway;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+
+}
+
+.single__ammenity{
+    cursor: pointer;
+    margin-right: 20px;
+}
+
+.hostsharing__container > img{
+    height: 482px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+.hostsharing__container{
+    margin: 0 10% 100px 10%;
+    font-family: Raleway;
+    overflow: hidden;
+    position: relative;
+}
+
+.hostsharing__text__container{
+    position: absolute;
+    top: 0px;
+    left: 100px;
+    width: 400px;
+}
+
+.hostsharing__text__container{
+    color: white;
+}
+
+.hostsharing__text__container > h1{
+    font-size: 60px;
+}
+
+.hostsharing__text__container > h4{
+    font-size: 30px;
+}
+
+.hostsharing__text__container > button{
+    background-color: white;
+    outline: none;
+    border: none;
+    font-family: Raleway;
+    font-weight: bold;
+    height: 50px;
+    font-size: 20px;
+    width: 200px;
+    border-radius: 30px;
+}
+
+.hostsharing__text__container > button:hover{
+    background-color: #B1EAB8;
+}
