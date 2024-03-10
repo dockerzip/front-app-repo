@@ -1,28 +1,30 @@
-name: Build Front
+name: Build and Deploy
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
-
-      - name: Setup Node.js with nvm and build
+      
+      # Node.js 설정 및 React 앱 빌드
+      - name: Setup Node.js and Build React App
         run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.1/install.sh | bash
           export NVM_DIR="$HOME/.nvm"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
           [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-          nvm install 16
-          nvm use 16
-          cd react-app  # 디렉토리 이동
+          nvm install 12
+          nvm use 12
+          cd react-app
           npm install
           npm run build
 
+      # AWS 자격증명 설정
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -30,26 +32,26 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
+      # Amazon ECR 로그인
       - name: Login to Amazon ECR
-        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Get image tag(version)
-        id: image
+      # 이미지 태그(버전) 가져오기
+      - name: Get image tag (version)
         run: |
           VERSION=$(echo ${{ github.sha }} | cut -c1-8)
           echo VERSION=$VERSION
           echo "::set-output name=version::$VERSION"
 
+      # Docker 이미지 빌드 및 Amazon ECR로 푸시
       - name: Build, tag, and push image to Amazon ECR
-        id: image-info
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: demo-flask-backend  # 여기에 실제 ECR 저장소 이름을 입력하세요.
+          ECR_REPOSITORY: demo-flask-backend  # ECR 저장소 이름을 실제 이름으로 교체하세요.
           IMAGE_TAG: ${{ steps.image.outputs.version }}
         run: |
-          cd react-app  # 디렉토리 이동
-          echo "::set-output name=ecr_repository::$ECR_REPOSITORY"
-          echo "::set-output name=image_tag::$IMAGE_TAG"
+          # React 앱 빌드 결과물을 Flask 앱 정적 파일로 복사
+          cp -R react-app/build/* var/www/app/static/
+          # Docker 이미지 빌드 및 푸시
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
