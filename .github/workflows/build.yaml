@@ -1,26 +1,18 @@
-name: Build Front
-
-on:
-  push:
-    branches: [ main ]
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16.20.1'
-      
-      - name: Check Node v
-        run: node -v
 
-      - name: Build front
+      - name: Setup Node.js with nvm and build
         run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.1/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+          nvm install 16
+          nvm use v16
           npm install
           npm run build
 
@@ -35,7 +27,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Get image tag(verion)
+      - name: Get image tag(version)
         id: image
         run: |
           VERSION=$(echo ${{ github.sha }} | cut -c1-8)
@@ -46,7 +38,7 @@ jobs:
         id: image-info
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: demo-frontend
+          ECR_REPOSITORY: demo-flask-backend  # 여기를 수정했습니다
           IMAGE_TAG: ${{ steps.image.outputs.version }}
         run: |
           echo "::set-output name=ecr_repository::$ECR_REPOSITORY"
