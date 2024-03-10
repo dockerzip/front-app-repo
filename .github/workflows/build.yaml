@@ -35,9 +35,11 @@ jobs:
       # Amazon ECR 로그인
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
+        id: login-ecr  # 이 id를 추가하여 로그인 단계의 출력을 참조할 수 있게 합니다.
 
       # 이미지 태그(버전) 가져오기
       - name: Get image tag (version)
+        id: image  # 이 id를 추가하여 이미지 태그 단계의 출력을 참조할 수 있게 합니다.
         run: |
           VERSION=$(echo ${{ github.sha }} | cut -c1-8)
           echo VERSION=$VERSION
@@ -46,9 +48,9 @@ jobs:
       # Docker 이미지 빌드 및 Amazon ECR로 푸시
       - name: Build, tag, and push image to Amazon ECR
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}  # 이 변수를 사용하여 ECR 로그인 단계의 출력에서 레지스트리 주소를 가져옵니다.
           ECR_REPOSITORY: demo-flask-backend  # ECR 저장소 이름을 실제 이름으로 교체하세요.
-          IMAGE_TAG: ${{ steps.image.outputs.version }}
+          IMAGE_TAG: ${{ steps.image.outputs.version }}  # 이 변수를 사용하여 이미지 태그(버전) 단계의 출력에서 버전을 가져옵니다.
         run: |
           # React 앱 빌드 결과물을 Flask 앱 정적 파일로 복사
           cp -R react-app/build/* var/www/app/static/
