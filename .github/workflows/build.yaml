@@ -18,7 +18,8 @@ jobs:
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
           [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
           nvm install 16
-          nvm use v16
+          nvm use 16
+          cd front-app-repo/react-app  # 디렉토리 이동
           npm install
           npm run build
 
@@ -44,9 +45,10 @@ jobs:
         id: image-info
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: demo-flask-backend  # 여기를 수정했습니다
+          ECR_REPOSITORY: demo-flask-backend  # 여기에 실제 ECR 저장소 이름을 입력하세요.
           IMAGE_TAG: ${{ steps.image.outputs.version }}
         run: |
+          cd front-app-repo/react-app  # 디렉토리 이동
           echo "::set-output name=ecr_repository::$ECR_REPOSITORY"
           echo "::set-output name=image_tag::$IMAGE_TAG"
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
